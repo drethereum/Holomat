@@ -5,14 +5,15 @@ import os
 import sys
 import math
 from camera_manager import CameraManager
+import apps.app_1
 import apps.app_2
-import apps.app_4
-import apps.app_5
+import apps.app_3
 # Initialize Pygame
 pygame.init()
 # Initialize the mixer
 mixer.init()
-SCREEN_SIZE = (1920, 1200)
+WIDTH, HEIGHT = 1920, 1080
+SCREEN_SIZE = (WIDTH, HEIGHT)
 NAVY_BLUE = (20, 20, 40)
 LIGHT_BLUE = (173, 216, 230)
 HOME_TOGGLE_DELAY = 1.0  # Delay in seconds for home button toggle
@@ -183,8 +184,9 @@ def run_home_screen(screen, camera_manager):
         pygame.time.delay(50)
 
 if __name__ == '__main__':
-    os.environ['SDL_VIDEO_WINDOW_POS'] = '-3440,0'
-    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    # os.environ['SDL_VIDEO_WINDOW_POS'] = '-3440,0'
+    # screen = pygame.display.set_mode(SCREEN_SIZE)
+    screen = pygame.display.set_mode(SCREEN_SIZE, pygame.FULLSCREEN)
     pygame.display.set_caption('Home Screen')
-    camera_manager = CameraManager('./M.npy', 1920, 1200)
+    camera_manager = CameraManager('./M.npy', WIDTH, HEIGHT)
     run_home_screen(screen, camera_manager)

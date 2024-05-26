@@ -1,5 +1,6 @@
 import pygame
 from pygame import mixer
+from camera_manager import CameraManager
 import sys
 
 # Initialize Pygame
@@ -7,7 +8,8 @@ pygame.init()
 # Initialize the mixer
 mixer.init()
 
-SCREEN_SIZE = (1920, 1200)
+WIDTH, HEIGHT = 1920, 1080
+SCREEN_SIZE = (WIDTH, HEIGHT)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 LIGHT_BLUE = (173, 216, 230)
@@ -79,13 +81,12 @@ def run(screen, camera_manager):
         count_rect = count_surface.get_rect(center=(SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2 - 400))
         screen.blit(count_surface, count_rect)
 
-        pygame.display.flip()
+        # pygame.display.flip()
         pygame.time.delay(50)
 
 if __name__ == '__main__':
-    from camera_manager import CameraManager  # Assuming CameraManager is in the parent directory
-
+    # from camera_manager import CameraManager  # Assuming CameraManager is in the parent directory
     screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption('Click Counter App')
-    camera_manager = CameraManager('./M.npy', 1920, 1200)
+    camera_manager = CameraManager('./M.npy', WIDTH, HEIGHT)
     run(screen, camera_manager)

@@ -6,11 +6,13 @@ from PIL import Image
 from datetime import datetime
 from transformers import AutoImageProcessor, AutoModelForDepthEstimation
 from pygame import mixer
+from camera_manager import CameraManager
 import sys
 
 # Initialize Pygame
 pygame.init()
-SCREEN_SIZE = (1920, 1200)
+WIDTH, HEIGHT = 1920, 1080
+SCREEN_SIZE = (WIDTH, HEIGHT)
 BLACK = (0, 0, 0)
 LIGHT_BLUE = (173, 216, 230)
 WHITE = (255, 255, 255)
@@ -134,7 +136,7 @@ def run(screen, camera_manager):
                 if ret:
                     # Apply M1 transformation to the captured image
                     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    frame_transformed = cv2.warpPerspective(frame_rgb, camera_manager.M1, (SCREEN_SIZE[0], SCREEN_SIZE[1]))
+                    frame_transformed = cv2.warpPerspective(frame_rgb, camera_manager.M, (SCREEN_SIZE[0], SCREEN_SIZE[1]))
                     image = Image.fromarray(frame_transformed)
                     depth_colored, depth_cv = perform_depth_estimation(image)
 
@@ -180,9 +182,9 @@ def run(screen, camera_manager):
         pygame.time.delay(1)
 
 if __name__ == '__main__':
-    from camera_manager import CameraManager  # Assuming CameraManager is in the parent directory
+    # from camera_manager import CameraManager  # Assuming CameraManager is in the parent directory
 
     screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption('Depth Estimation App')
-    camera_manager = CameraManager('./M.npy', 1920, 1200)
+    camera_manager = CameraManager('./M.npy', WIDTH, HEIGHT)
     run(screen, camera_manager)
