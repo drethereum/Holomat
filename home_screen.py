@@ -1,6 +1,5 @@
 import pygame
 from pygame import mixer
-import ctypes
 from screeninfo import get_monitors
 import time
 import os
@@ -55,8 +54,6 @@ class AppCircle:
         self.animation_start_time = None
         self.is_animating = False
         self.image = self.load_image()
-
-    
 
     def load_image(self):
         if not self.is_main:
@@ -202,9 +199,7 @@ def run_home_screen(screen, camera_manager):
         pygame.time.delay(50)
 
 if __name__ == '__main__':
-    # Set the position to the top-left corner of the secondary display
-    # os.environ['SDL_VIDEO_WINDOW_POS'] = f'{WIDTH},0'
-    # screen = pygame.display.set_mode(SCREEN_SIZE, pygame.FULLSCREEN)
-    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+    screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
     pygame.display.set_caption('Home Screen')
     camera_manager = CameraManager('./M.npy', WIDTH, HEIGHT)
+    run_home_screen(screen, camera_manager)

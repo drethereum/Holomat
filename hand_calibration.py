@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import mediapipe as mp
+import os
+from screeninfo import get_monitors
 
 # Initialize mediapipe
 mp_hands = mp.solutions.hands
@@ -11,11 +13,25 @@ hands = mp_hands.Hands(static_image_mode=False,
 
 mp_drawing = mp.solutions.drawing_utils
 
+# Get information about all monitors
+monitors = get_monitors()
+
+# Set default to primary monitor
+screen_width, screen_height = monitors[0].width, monitors[0].height
+
+# Set the position and size to the second monitor if it exists
+if len(monitors) > 1:
+    primary_display_width = monitors[0].width
+    screen_width, screen_height = monitors[1].width, monitors[1].height
+    os.environ['SDL_VIDEO_WINDOW_POS'] = f'{primary_display_width},0'
+else:
+    os.environ['SDL_VIDEO_WINDOW_POS'] = '0,0'
+
 # Camera capture setup
 cap = cv2.VideoCapture(1)
 
 # Projector width and height
-width, height = 1920, 1080
+width, height = screen_width, screen_height
 
 # Define target points for calibration (projected positions)
 target_points = [(100, 100), (width - 100, 100), (width - 100, height - 100), (100, height - 100)]
