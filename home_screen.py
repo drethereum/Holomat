@@ -1,5 +1,7 @@
 import pygame
 from pygame import mixer
+import ctypes
+from screeninfo import get_monitors
 import time
 import os
 import sys
@@ -8,11 +10,27 @@ from camera_manager import CameraManager
 import apps.app_1
 import apps.app_2
 import apps.app_3
+
 # Initialize Pygame
 pygame.init()
 # Initialize the mixer
 mixer.init()
-WIDTH, HEIGHT = 1920, 1080
+# Get information about all monitors
+monitors = get_monitors()
+
+# Set default to primary monitor
+screen_width, screen_height = monitors[0].width, monitors[0].height
+
+# Set the position and size to the second monitor if it exists
+if len(monitors) > 1:
+    primary_display_width = monitors[0].width
+    screen_width, screen_height = monitors[1].width, monitors[1].height
+    os.environ['SDL_VIDEO_WINDOW_POS'] = f'{primary_display_width},0'
+else:
+    os.environ['SDL_VIDEO_WINDOW_POS'] = '0,0'
+
+# Update WIDTH and HEIGHT
+WIDTH, HEIGHT = screen_width, screen_height
 SCREEN_SIZE = (WIDTH, HEIGHT)
 NAVY_BLUE = (20, 20, 40)
 LIGHT_BLUE = (173, 216, 230)
@@ -184,9 +202,9 @@ def run_home_screen(screen, camera_manager):
         pygame.time.delay(50)
 
 if __name__ == '__main__':
-    # os.environ['SDL_VIDEO_WINDOW_POS'] = '-3440,0'
-    # screen = pygame.display.set_mode(SCREEN_SIZE)
-    screen = pygame.display.set_mode(SCREEN_SIZE, pygame.FULLSCREEN)
+    # Set the position to the top-left corner of the secondary display
+    # os.environ['SDL_VIDEO_WINDOW_POS'] = f'{WIDTH},0'
+    # screen = pygame.display.set_mode(SCREEN_SIZE, pygame.FULLSCREEN)
+    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     pygame.display.set_caption('Home Screen')
     camera_manager = CameraManager('./M.npy', WIDTH, HEIGHT)
-    run_home_screen(screen, camera_manager)
