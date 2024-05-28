@@ -1,11 +1,12 @@
 import pygame
 from pygame import mixer
-from screeninfo import get_monitors
+import display_manager
 import time
 import os
 import sys
 import math
 from camera_manager import CameraManager
+from display_manager import DisplayManager
 import apps.app_1
 import apps.app_2
 import apps.app_3
@@ -14,23 +15,12 @@ import apps.app_3
 pygame.init()
 # Initialize the mixer
 mixer.init()
-# Get information about all monitors
-monitors = get_monitors()
 
-# Set default to primary monitor
-screen_width, screen_height = monitors[0].width, monitors[0].height
-
-# Set the position and size to the second monitor if it exists
-if len(monitors) > 1:
-    primary_display_width = monitors[0].width
-    screen_width, screen_height = monitors[1].width, monitors[1].height
-    os.environ['SDL_VIDEO_WINDOW_POS'] = f'{primary_display_width},0'
-else:
-    os.environ['SDL_VIDEO_WINDOW_POS'] = '0,0'
-
-# Update WIDTH and HEIGHT
-WIDTH, HEIGHT = screen_width, screen_height
+# Get display settings
+display = DisplayManager()
+WIDTH, HEIGHT = display.get_screen_dimensions()
 SCREEN_SIZE = (WIDTH, HEIGHT)
+
 NAVY_BLUE = (20, 20, 40)
 LIGHT_BLUE = (173, 216, 230)
 HOME_TOGGLE_DELAY = 1.0  # Delay in seconds for home button toggle
