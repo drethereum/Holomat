@@ -1,47 +1,52 @@
 import pygame
 from pygame import mixer
-from screeninfo import get_monitors
+import display_manager
 import time
 import os
 import sys
 import math
 from camera_manager import CameraManager
+from display_manager import DisplayManager
 import apps.app_1
 import apps.app_2
 import apps.app_3
 
 # Initialize Pygame
 pygame.init()
-# Initialize the mixer
+
+# Initialize the mixer for playing audio
 mixer.init()
-# Get information about all monitors
-monitors = get_monitors()
 
-# Set default to primary monitor
-screen_width, screen_height = monitors[0].width, monitors[0].height
-
-# Set the position and size to the second monitor if it exists
-if len(monitors) > 1:
-    primary_display_width = monitors[0].width
-    screen_width, screen_height = monitors[1].width, monitors[1].height
-    os.environ['SDL_VIDEO_WINDOW_POS'] = f'{primary_display_width},0'
-else:
-    os.environ['SDL_VIDEO_WINDOW_POS'] = '0,0'
-
-# Update WIDTH and HEIGHT
-WIDTH, HEIGHT = screen_width, screen_height
+# Get display settings from the DisplayManager
+display = DisplayManager()
+WIDTH, HEIGHT = display.get_screen_dimensions()
 SCREEN_SIZE = (WIDTH, HEIGHT)
+
+# Define app settings (colors etc.)
 NAVY_BLUE = (20, 20, 40)
 LIGHT_BLUE = (173, 216, 230)
-HOME_TOGGLE_DELAY = 1.0  # Delay in seconds for home button toggle
+HOME_TOGGLE_DELAY = 1.0  # Delay in seconds for toggling home screen
 APP_SELECT_DELAY = 1.0  # Delay to prevent immediate app launch
 
 def play_sound(file_path):
-        mixer.music.load(file_path)
-        mixer.music.play()
+    """
+    Play a sound from the given file path using the mixer.
+    """
+    mixer.music.load(file_path)
+    mixer.music.play()
 
 class AppCircle:
     def __init__(self, center, radius, app_index, final_pos, is_main=False):
+        """
+        Initialize the AppCircle with position, radius, index, and other attributes.
+
+        Parameters:
+        - center: Tuple for the initial position of the circle.
+        - radius: Radius of the circle.
+        - app_index: Index of the app this circle represents.
+        - final_pos: The final position of the circle after animation.
+        - is_main: Boolean to indicate if this is the main circle.
+        """
         self.center = center
         self.radius = radius
         self.app_index = app_index
@@ -56,6 +61,9 @@ class AppCircle:
         self.image = self.load_image()
 
     def load_image(self):
+        """
+        Load an image for the circle if it is not the main circle.
+        """
         if not self.is_main:
             image_path = f'./resources/app_{self.app_index}.jpg'
             if os.path.exists(image_path):
@@ -64,11 +72,18 @@ class AppCircle:
         return None
 
     def draw(self, screen):
+        """
+        Draw the circle on the screen and handle animations.
+
+        Parameters:
+        - screen: The Pygame screen to draw the circle on.
+        """
         if self.is_hovered_flag:
             current_radius = self.radius + min((time.time() - self.hover_time) * 10, self.radius * 0.5)
         else:
             current_radius = self.radius
 
+        # Animate the circle to its final position
         if self.animation_start_time is not None:
             elapsed_time = time.time() - self.animation_start_time
             if elapsed_time < 0.5:
@@ -88,6 +103,7 @@ class AppCircle:
                 self.animation_start_time = None
                 self.is_animating = False
 
+        # Draw the circle and its contents
         if self.visible or self.is_animating:
             if self.image:
                 top_left = (self.center[0] - self.radius, self.center[1] - self.radius)
@@ -103,9 +119,21 @@ class AppCircle:
                 screen.blit(text_surface, text_rect)
 
     def is_hovered(self, pos):
+        """
+        Check if the circle is being hovered over by the given position.
+
+        Parameters:
+        - pos: Tuple of the (x, y) position to check.
+        """
         return math.hypot(pos[0] - self.center[0], pos[1] - self.center[1]) <= self.radius
 
 def create_circles():
+    """
+    Create the circles for the home screen.
+
+    Returns:
+    - A list of AppCircle objects representing the home screen and apps.
+    """
     circles = []
     num_circles = 8
     center_x, center_y = SCREEN_SIZE[0] // 2, SCREEN_SIZE[1] // 2
@@ -113,9 +141,11 @@ def create_circles():
     app_circle_radius = 75
     distance = 250
 
+    # Create the main circle
     main_circle = AppCircle((center_x, center_y), main_circle_radius, 0, (center_x, center_y), is_main=True)
     circles.append(main_circle)
 
+    # Create the app circles arranged in a circle around the main circle
     angle_step = 360 / num_circles
     for i in range(num_circles):
         angle = math.radians(angle_step * i)
@@ -125,6 +155,13 @@ def create_circles():
     return circles
 
 def run_home_screen(screen, camera_manager):
+    """
+    Run the home screen application.
+
+    Parameters:
+    - screen: The Pygame screen to draw the home screen on.
+    - camera_manager: The CameraManager object to handle camera input.
+    """
     circles = create_circles()
     main_circle = circles[0]
     running = True
@@ -199,7 +236,9 @@ def run_home_screen(screen, camera_manager):
         pygame.time.delay(50)
 
 if __name__ == '__main__':
+    # Set the display mode
     screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
     pygame.display.set_caption('Home Screen')
-    camera_manager = CameraManager('./M.npy', WIDTH, HEIGHT)
+    # Initialize the CameraManager with the transformation matrix and screen dimensions
+    camera_manager = CameraManager('./M.npy')
     run_home_screen(screen, camera_manager)
