@@ -240,5 +240,5 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)
     pygame.display.set_caption('Home Screen')
     # Initialize the CameraManager with the transformation matrix and screen dimensions
-    camera_manager = CameraManager('./M.npy', WIDTH, HEIGHT)
+    camera_manager = CameraManager('./M.npy')
     run_home_screen(screen, camera_manager)
